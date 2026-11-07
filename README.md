@@ -120,6 +120,29 @@ The frontend (Vercel) and API (Render) live on different domains. Calling the AP
 
 The free Render tier sleeps when idle, so the first request after a pause can take about 30 seconds.
 
+## Mobile app (Flutter)
+
+A native Android / iOS client lives in [`mobile/`](mobile/). It uses the same REST API and the same Midnight Lime theme as the web app: login (with quick demo sign-in), dashboard analytics, doctors with search and filters, doctor profile with patients, and a patients list with edit and delete.
+
+```bash
+cd mobile
+flutter pub get
+flutter run        # talks to the live API by default; see mobile/README.md to point it elsewhere
+```
+
+<table>
+  <tr>
+    <td><img src="docs/screenshots/mobile-login.png" alt="Login" width="200"></td>
+    <td><img src="docs/screenshots/mobile-dashboard.png" alt="Dashboard" width="200"></td>
+    <td><img src="docs/screenshots/mobile-doctors.png" alt="Doctors" width="200"></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/mobile-filters.png" alt="Filters" width="200"></td>
+    <td><img src="docs/screenshots/mobile-doctor-detail.png" alt="Doctor profile" width="200"></td>
+    <td><img src="docs/screenshots/mobile-patients.png" alt="Patients" width="200"></td>
+  </tr>
+</table>
+
 ## Visual evidence
 
 Theme: **Midnight Lime**, a dark charcoal UI with a lime accent (Space Grotesk headings, Inter body).
