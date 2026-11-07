@@ -1,0 +1,23 @@
+# Render Blueprint for the API. The frontend deploys to Vercel; the database lives on MongoDB Atlas.
+services:
+  - type: web
+    name: doctor-tracker-api
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false # paste your Atlas mongodb+srv:// string in the Render dashboard
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        sync: false # your Vercel URL, e.g. https://doctor-tracker.vercel.app
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
