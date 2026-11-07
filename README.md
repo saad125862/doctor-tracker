@@ -66,6 +66,19 @@ Browser ──► Next.js (Vercel / :3000)
 - **Data flow:** pages call `/api/...` on their own origin. Next.js rewrites those requests to the Express server, so the browser never makes a cross-site call.
 - **Environments:** local = Docker Compose (`mongo`, `backend`, `frontend`). Live = Vercel (frontend), Render (API, see `render.yaml`) and MongoDB Atlas (database).
 
+### API documentation (Swagger UI)
+
+Interactive docs for every endpoint, with "Try it out":
+
+| Where | URL |
+| --- | --- |
+| Local backend | http://localhost:4000/api-docs |
+| Local via frontend | http://localhost:3000/api-docs |
+| Live (Render) | `https://<your-service>.onrender.com/api-docs` |
+| Live (Vercel) | `https://<your-app>.vercel.app/api-docs` (proxied to the backend) |
+
+Raw spec: `/api-docs.json`. To call protected endpoints, run `POST /api/auth/login` (or `/api/auth/demo`) first; the session cookie is set automatically.
+
 ### REST API
 
 | Method | Route | Description |
