@@ -122,6 +122,8 @@ The free Render tier sleeps when idle, so the first request after a pause can ta
 
 ## Mobile app (Flutter)
 
+**[Download the Android APK](https://github.com/saad125862/doctor-tracker/releases/latest/download/doctor-tracker.apk)** (sideload; see the [release page](https://github.com/saad125862/doctor-tracker/releases/latest)).
+
 A native Android / iOS client lives in [`mobile/`](mobile/). It uses the same REST API and the same Midnight Lime theme as the web app: login (with quick demo sign-in), dashboard analytics, doctors with search and filters, doctor profile with patients, and a patients list with edit and delete.
 
 ```bash
