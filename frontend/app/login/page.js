@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Reveal, ease } from '@/components/motion';
+import { LogoMark, Wordmark } from '@/components/Logo';
 import { api } from '@/lib/api';
 
 // Inlined at build time; the API must also run with DEMO_MODE=true for the button to work
@@ -48,8 +49,10 @@ export default function LoginPage() {
         <span className="blob b2" />
         <Reveal delay={0.1}>
           <div className="brand">
-            <div className="brand-mark">＋</div>
-            Doctor Tracker
+            <div className="brand-mark">
+              <LogoMark size={40} />
+            </div>
+            <Wordmark />
           </div>
         </Reveal>
         <Reveal delay={0.25}><h1>Doctors and patients, finally in one place.</h1></Reveal>

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../state/auth_state.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
+import 'custom_fields_screen.dart';
 import 'dashboard_screen.dart';
 import 'doctors_screen.dart';
 import 'patients_screen.dart';
@@ -33,9 +34,10 @@ class _HomeShellState extends State<HomeShell> {
           PopupMenuButton<String>(
             color: AppColors.raise,
             icon: const Icon(Icons.account_circle_rounded, size: 30, color: AppColors.muted),
-            onSelected: (_) => _signOut(),
+            onSelected: (v) => v == 'fields' ? Navigator.push(context, MaterialPageRoute(builder: (_) => const CustomFieldsScreen())) : _signOut(),
             itemBuilder: (_) => [
               PopupMenuItem(enabled: false, child: Text(auth.email ?? 'Admin', style: const TextStyle(color: AppColors.muted))),
+              const PopupMenuItem(value: 'fields', child: Row(children: [Icon(Icons.extension_rounded, size: 18), SizedBox(width: 10), Text('Custom fields')])),
               const PopupMenuItem(value: 'out', child: Row(children: [Icon(Icons.logout_rounded, size: 18), SizedBox(width: 10), Text('Sign out')])),
             ],
           ),

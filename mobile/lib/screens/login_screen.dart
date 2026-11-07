@@ -4,6 +4,7 @@ import '../api/api_client.dart';
 import '../config.dart';
 import '../state/auth_state.dart';
 import '../theme.dart';
+import '../widgets/logo.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -49,15 +50,10 @@ class _LoginScreenState extends State<LoginScreen> {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 420),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  Row(children: [
-                    Container(
-                      width: 38,
-                      height: 38,
-                      decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(11)),
-                      child: const Icon(Icons.add_rounded, color: AppColors.onPrimary, size: 24),
-                    ),
-                    const SizedBox(width: 12),
-                    Text('Doctor Tracker', style: head(20)),
+                  const Row(children: [
+                    LogoMark(size: 38),
+                    SizedBox(width: 14),
+                    Wordmark(fontSize: 26),
                   ]),
                   const SizedBox(height: 36),
                   Text('Doctors and patients,\nfinally in one place.', style: head(32)),

@@ -6,6 +6,7 @@ import '../state/auth_state.dart';
 import '../state/paged_list.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
+import '../widgets/custom_fields.dart';
 import '../widgets/filter_sheet.dart';
 import '../widgets/forms.dart';
 import '../widgets/patient_tile.dart';
@@ -23,6 +24,16 @@ class _PatientsScreenState extends State<PatientsScreen> {
     final res = await api.get('/patients', query: {...f, 'page': page, 'limit': limit});
     return Paged.fromJson(res, Patient.fromJson);
   });
+
+  List<CustomField> fields = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadCustomFields(api, 'patient').then((f) {
+      if (mounted) setState(() => fields = f);
+    }).catchError((Object _) {});
+  }
 
   @override
   void dispose() {
@@ -118,7 +129,7 @@ class _PatientsScreenState extends State<PatientsScreen> {
             emptyIcon: Icons.groups_outlined,
             emptyTitle: 'No patients found',
             emptyText: 'Try changing your search or filters.',
-            itemBuilder: (_, p) => PatientTile(patient: p, onEdit: () => _edit(p), onDelete: () => _delete(p)),
+            itemBuilder: (_, p) => PatientTile(patient: p, fields: fields, onEdit: () => _edit(p), onDelete: () => _delete(p)),
           ),
         ),
       ]),

@@ -11,13 +11,17 @@ import { AnimatePresence } from 'framer-motion';
 import { MRow } from '@/components/motion';
 import { ConfirmDialog, Modal } from '@/components/Modal';
 import { PatientForm } from '@/components/Forms';
+import { CustomLine } from '@/components/CustomFields';
+import { useCustomFields } from '@/hooks/useCustomFields';
+import { customEntries } from '@/lib/customFields';
 
-const Row = memo(function Row({ p, i, onDelete }) {
+const Row = memo(function Row({ p, i, fields, onDelete }) {
   return (
     <MRow i={i}>
       <td>
         <div className="name" style={{ fontWeight: 600 }}>{p.name}</div>
         <div className="muted hide-sm" style={{ fontSize: 13 }}>{p.phone || '—'}</div>
+        <CustomLine fields={fields} values={p.custom} />
       </td>
       <td>{p.age}</td>
       <td><GenderBadge gender={p.gender} /></td>
@@ -39,6 +43,8 @@ export default function DoctorDetailPage() {
   const { state, params, set, setPage } = useListFilters();
   const [adding, setAdding] = useState(false);
   const [toDelete, setToDelete] = useState(null);
+  const { data: doctorFields = [] } = useCustomFields('doctor');
+  const { data: patientFields = [] } = useCustomFields('patient');
 
   const doctor = useQuery({ queryKey: ['doctor', id], queryFn: () => api(`/doctors/${id}`) });
   const patients = useQuery({
@@ -103,6 +109,11 @@ export default function DoctorDetailPage() {
                 <span>✉️ {d.email}</span>
                 <span>👥 {d.patientCount} patients</span>
                 <span>Joined {formatDate(d.createdAt)}</span>
+                {customEntries(doctorFields, d.custom).map((e) => (
+                  <span key={e.id}>
+                    {e.label}: {e.text}
+                  </span>
+                ))}
               </div>
             </div>
             <button className="btn btn-ghost" onClick={() => setDeletingDoctor(true)}>Delete doctor</button>
@@ -142,7 +153,7 @@ export default function DoctorDetailPage() {
               </thead>
               <tbody>
                 {patients.data.data.map((p, i) => (
-                  <Row key={p._id} p={p} i={i} onDelete={askDelete} />
+                  <Row key={p._id} p={p} i={i} fields={patientFields} onDelete={askDelete} />
                 ))}
               </tbody>
             </table>

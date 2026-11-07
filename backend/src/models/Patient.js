@@ -8,6 +8,8 @@ const patientSchema = new mongoose.Schema(
     condition: { type: String, required: true, trim: true },
     phone: { type: String, trim: true, default: '' },
     doctor: { type: mongoose.Schema.Types.ObjectId, ref: 'Doctor', required: true },
+    // values for admin-defined custom fields, keyed by CustomField.key
+    custom: { type: mongoose.Schema.Types.Mixed, default: {} },
     nameLower: String,
     conditionLower: String,
   },

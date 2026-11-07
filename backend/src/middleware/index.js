@@ -41,6 +41,9 @@ export function errorHandler(err, _req, res, _next) {
       errors: err.issues.map((i) => ({ field: i.path.join('.'), message: i.message })),
     });
   }
+  if (err?.status === 400 && Array.isArray(err.errors)) {
+    return res.status(400).json({ message: err.message, errors: err.errors });
+  }
   if (err?.code === 11000) {
     const field = Object.keys(err.keyPattern || {})[0] || 'field';
     return res.status(409).json({ message: `A record with this ${field} already exists` });

@@ -4,11 +4,13 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { api } from '@/lib/api';
+import { LogoMark, Wordmark } from '@/components/Logo';
 
 const links = [
   { href: '/', label: 'Dashboard', icon: '📊' },
   { href: '/doctors', label: 'Doctors', icon: '🩺' },
   { href: '/patients', label: 'Patients', icon: '🧑‍🤝‍🧑' },
+  { href: '/custom-fields', label: 'Custom fields', icon: '🧩' },
 ];
 
 export default function Sidebar() {
@@ -29,10 +31,12 @@ export default function Sidebar() {
   return (
     <motion.aside className="sidebar" initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}>
       <div className="brand">
-        <motion.div className="brand-mark" whileHover={{ rotate: 90, scale: 1.08 }} transition={{ type: 'spring', stiffness: 300, damping: 15 }}>
-          ＋
+        <motion.div className="brand-mark" whileHover={{ rotate: -8, scale: 1.1 }} transition={{ type: 'spring', stiffness: 300, damping: 15 }}>
+          <LogoMark size={30} />
         </motion.div>
-        <span className="t">Doctor Tracker</span>
+        <span className="t">
+          <Wordmark />
+        </span>
       </div>
       <nav className="nav">
         {links.map((l) => {

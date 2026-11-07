@@ -38,6 +38,7 @@ export const openapi = {
   tags: [
     { name: 'Auth' },
     { name: 'Dashboard' },
+    { name: 'Custom fields' },
     { name: 'Doctors' },
     { name: 'Patients' },
     { name: 'System' },
@@ -74,6 +75,59 @@ export const openapi = {
         security: secured,
         parameters: [{ name: 'days', in: 'query', schema: { type: 'integer', minimum: 7, maximum: 365, default: 30 } }],
         responses: { 200: ok('Aggregated stats', ref('DashboardStats')), 401: errors[401] },
+      },
+    },
+
+    '/api/custom-fields': {
+      get: {
+        tags: ['Custom fields'],
+        summary: 'List custom fields',
+        description: 'Admin-defined extra fields for the doctor or patient forms, in display order. Archived fields are not returned.',
+        security: secured,
+        parameters: [{ name: 'entity', in: 'query', schema: { type: 'string', enum: ['doctor', 'patient'] } }],
+        responses: { 200: ok('Fields', { type: 'object', properties: { data: { type: 'array', items: ref('CustomField') } } }), 401: errors[401] },
+      },
+      post: {
+        tags: ['Custom fields'],
+        summary: 'Create a custom field',
+        description: 'Types: text, longtext, number, date, dropdown (needs `options`), boolean. The storage key is generated from the label.',
+        security: secured,
+        requestBody: { required: true, content: { 'application/json': { schema: ref('CustomFieldInput') } } },
+        responses: { 201: ok('Created', { type: 'object', properties: { data: ref('CustomField') } }), 400: errors[400], 401: errors[401] },
+      },
+    },
+    '/api/custom-fields/reorder': {
+      put: {
+        tags: ['Custom fields'],
+        summary: 'Reorder custom fields',
+        security: secured,
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: { type: 'object', required: ['entity', 'ids'], properties: { entity: { type: 'string', enum: ['doctor', 'patient'] }, ids: { type: 'array', items: { type: 'string' } } } } } },
+        },
+        responses: { 200: ok('Reordered', { type: 'object', properties: { ok: { type: 'boolean' } } }), 400: errors[400], 401: errors[401] },
+      },
+    },
+    '/api/custom-fields/{id}': {
+      patch: {
+        tags: ['Custom fields'],
+        summary: 'Edit a custom field',
+        description: 'The type and key cannot change. Options can only be sent for dropdown fields.',
+        security: secured,
+        parameters: [id],
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: { type: 'object', properties: { label: { type: 'string' }, options: { type: 'array', items: { type: 'string' } }, required: { type: 'boolean' } } } } },
+        },
+        responses: { 200: ok('Updated', { type: 'object', properties: { data: ref('CustomField') } }), 400: errors[400], 401: errors[401], 404: errors[404] },
+      },
+      delete: {
+        tags: ['Custom fields'],
+        summary: 'Delete (archive) a custom field',
+        description: 'Hides the field everywhere. Values already saved on doctors and patients are kept.',
+        security: secured,
+        parameters: [id],
+        responses: { 200: ok('Archived', { type: 'object', properties: { ok: { type: 'boolean' } } }), 401: errors[401], 404: errors[404] },
       },
     },
 
@@ -173,10 +227,33 @@ export const openapi = {
       LoginBody: { type: 'object', required: ['email', 'password'], properties: { email: { type: 'string', format: 'email', example: 'admin@example.com' }, password: { type: 'string', example: 'Admin@12345' } } },
       User: { type: 'object', properties: { id: { type: 'string' }, name: { type: 'string' }, email: { type: 'string' }, role: { type: 'string', example: 'admin' } } },
       LoginResponse: { type: 'object', properties: { user: ref('User'), token: { type: 'string', description: 'JWT (also set as httpOnly cookie)' } } },
+      CustomValues: {
+        type: 'object',
+        description: 'Values for custom fields, keyed by the field `key` (see GET /api/custom-fields). Required fields must be present on create.',
+        additionalProperties: true,
+        example: { years_of_experience: 12, blood_group: 'O+' },
+      },
+      CustomFieldInput: {
+        type: 'object',
+        required: ['entity', 'label', 'type'],
+        properties: {
+          entity: { type: 'string', enum: ['doctor', 'patient'] },
+          label: { type: 'string', example: 'Blood group' },
+          type: { type: 'string', enum: ['text', 'longtext', 'number', 'date', 'dropdown', 'boolean'] },
+          options: { type: 'array', items: { type: 'string' }, example: ['A+', 'B+', 'O+', 'AB+'], description: 'Required (at least one) for dropdown fields' },
+          required: { type: 'boolean', default: false },
+        },
+      },
+      CustomField: {
+        allOf: [
+          ref('CustomFieldInput'),
+          { type: 'object', properties: { _id: { type: 'string' }, key: { type: 'string', example: 'blood_group' }, order: { type: 'integer' }, createdAt: { type: 'string', format: 'date-time' } } },
+        ],
+      },
       DoctorInput: {
         type: 'object',
         required: ['name', 'specialization', 'hospital', 'phone', 'email'],
-        properties: { name: { type: 'string', example: 'Dr. Jane Smith' }, specialization: { type: 'string', example: 'Cardiology' }, hospital: { type: 'string', example: 'City General' }, phone: { type: 'string', example: '+92 300 1234567' }, email: { type: 'string', format: 'email' } },
+        properties: { name: { type: 'string', example: 'Dr. Jane Smith' }, specialization: { type: 'string', example: 'Cardiology' }, hospital: { type: 'string', example: 'City General' }, phone: { type: 'string', example: '+92 300 1234567' }, email: { type: 'string', format: 'email' }, custom: ref('CustomValues') },
       },
       Doctor: {
         allOf: [ref('DoctorInput'), { type: 'object', properties: { _id: { type: 'string' }, patientCount: { type: 'integer' }, createdAt: { type: 'string', format: 'date-time' }, updatedAt: { type: 'string', format: 'date-time' } } }],
@@ -184,12 +261,12 @@ export const openapi = {
       PatientInput: {
         type: 'object',
         required: ['name', 'age', 'gender', 'condition'],
-        properties: { name: { type: 'string', example: 'Aisha Khan' }, age: { type: 'integer', minimum: 0, maximum: 130, example: 34 }, gender: { type: 'string', enum: ['male', 'female', 'other'] }, condition: { type: 'string', example: 'Hypertension' }, phone: { type: 'string' } },
+        properties: { name: { type: 'string', example: 'Aisha Khan' }, age: { type: 'integer', minimum: 0, maximum: 130, example: 34 }, gender: { type: 'string', enum: ['male', 'female', 'other'] }, condition: { type: 'string', example: 'Hypertension' }, phone: { type: 'string' }, custom: ref('CustomValues') },
       },
       PatientUpdate: {
         type: 'object',
         description: 'Any subset of the patient fields, optionally reassigning to another doctor.',
-        properties: { name: { type: 'string' }, age: { type: 'integer' }, gender: { type: 'string', enum: ['male', 'female', 'other'] }, condition: { type: 'string' }, phone: { type: 'string' }, doctor: { type: 'string', description: 'Doctor id' } },
+        properties: { name: { type: 'string' }, age: { type: 'integer' }, gender: { type: 'string', enum: ['male', 'female', 'other'] }, condition: { type: 'string' }, phone: { type: 'string' }, doctor: { type: 'string', description: 'Doctor id' }, custom: { allOf: [ref('CustomValues')], description: 'Only the keys sent are changed; an empty value clears that key.' } },
       },
       Patient: {
         allOf: [

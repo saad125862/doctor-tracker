@@ -7,6 +7,8 @@ const doctorSchema = new mongoose.Schema(
     hospital: { type: String, required: true, trim: true },
     phone: { type: String, required: true, trim: true },
     email: { type: String, required: true, trim: true, lowercase: true },
+    // values for admin-defined custom fields, keyed by CustomField.key
+    custom: { type: mongoose.Schema.Types.Mixed, default: {} },
     // lowercase copies power fast, index-backed, case-insensitive prefix search
     nameLower: String,
     specializationLower: String,

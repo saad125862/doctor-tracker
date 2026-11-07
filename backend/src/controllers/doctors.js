@@ -1,6 +1,7 @@
 import { Doctor } from '../models/Doctor.js';
 import { Patient } from '../models/Patient.js';
 import { HttpError, SORTS, dateRange, pageMeta, prefixSearch } from '../utils/helpers.js';
+import { validateCustom } from '../utils/customFields.js';
 
 export async function listDoctors(req, res) {
   const { page, limit, q, from, to, sort, specialization, hospital } = req.validQuery;
@@ -42,7 +43,8 @@ export async function doctorFilters(_req, res) {
 }
 
 export async function createDoctor(req, res) {
-  const doctor = await Doctor.create(req.body);
+  const { set } = await validateCustom('doctor', req.body.custom);
+  const doctor = await Doctor.create({ ...req.body, custom: set });
   res.status(201).json({ data: doctor });
 }
 
@@ -85,6 +87,7 @@ export async function listDoctorPatients(req, res) {
 export async function addPatientToDoctor(req, res) {
   const exists = await Doctor.exists({ _id: req.params.id });
   if (!exists) throw new HttpError(404, 'Doctor not found');
-  const patient = await Patient.create({ ...req.body, doctor: req.params.id });
+  const { set } = await validateCustom('patient', req.body.custom);
+  const patient = await Patient.create({ ...req.body, custom: set, doctor: req.params.id });
   res.status(201).json({ data: patient });
 }

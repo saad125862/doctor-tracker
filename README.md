@@ -1,6 +1,8 @@
 # Doctor Tracker
 
-Doctor Tracker is a secure admin portal for managing doctors and their patients. Admins sign in, add doctors, assign and remove patients, and search, filter and paginate every list. A live dashboard turns the data into charts: totals, patients per doctor, top conditions and growth over time. It is a standalone Next.js client talking to a standalone Express API backed by MongoDB, with indexed queries and motion-polished, responsive UI.
+<p align="center"><img src="docs/logo/logo-dark.svg" alt="Doctor Tracker" width="380"></p>
+
+Doctor Tracker is a secure admin portal for managing doctors and their patients. Admins sign in, add doctors, assign and remove patients, and search, filter and paginate every list. Admins can also define their own custom fields (text, number, date, dropdown, yes/no) for doctors and patients. A live dashboard turns the data into charts: totals, patients per doctor, top conditions and growth over time. It is a standalone Next.js client talking to a standalone Express API backed by MongoDB, with indexed queries and motion-polished, responsive UI.
 
 **Stack:** Next.js 14 (App Router) · Express · MongoDB + Mongoose · TanStack Query · Recharts · Framer Motion · Docker
 
@@ -92,6 +94,9 @@ Raw spec: `/api-docs.json`. To call protected endpoints, run `POST /api/auth/log
 | GET / POST | `/api/doctors/:id/patients` | A doctor's patients / add a patient |
 | GET | `/api/patients` | List (search, condition, gender, doctor, dates, pagination) |
 | PATCH / DELETE | `/api/patients/:id` | Edit / delete |
+| GET / POST | `/api/custom-fields` | List / create custom fields (`?entity=doctor\|patient`) |
+| PATCH / DELETE | `/api/custom-fields/:id` | Edit / delete (archive) a custom field |
+| PUT | `/api/custom-fields/reorder` | Set the display order of a form's fields |
 
 List endpoints accept `page`, `limit`, `q`, `from`, `to`, `sort` and return `{ data, meta: { total, page, limit, totalPages } }`. Invalid input returns `400` with per-field errors.
 
@@ -104,6 +109,10 @@ An unanchored case-insensitive regex (`/ali/i`) forces a collection scan, and `$
 ### 2. Same-origin `/api` proxy with an httpOnly cookie (instead of cross-site tokens)
 
 The frontend (Vercel) and API (Render) live on different domains. Calling the API directly would need `SameSite=None` third-party cookies, which browsers increasingly block, or tokens stored in `localStorage`, which any XSS can read. Instead Next.js rewrites `/api/*` to the Express server, so the JWT cookie is **first-party, httpOnly and `SameSite=Lax`**. This removes CORS from the browser path and keeps the token out of JavaScript. Trade-off: API traffic passes through Vercel's rewrite layer.
+
+### Custom fields without schema changes
+
+Admins define extra fields (name, type, options, required) in a `custom_fields` collection. Each doctor or patient stores its values in a single `custom` object keyed by the field's stable slug, so adding a field never needs a migration and old records keep working. On every create or update the API validates the values against the current definitions (type coercion, dropdown membership, required checks) and drops unknown keys, so the data stays clean even though the shape is dynamic. Deleting a field only archives it: the form stops showing it, but the saved values are kept. Trade-off: custom values are not indexed, so they are shown but not searchable or filterable.
 
 ### Other choices
 
@@ -142,6 +151,15 @@ flutter run        # talks to the live API by default; see mobile/README.md to p
     <td><img src="docs/screenshots/mobile-filters.png" alt="Filters" width="200"></td>
     <td><img src="docs/screenshots/mobile-doctor-detail.png" alt="Doctor profile" width="200"></td>
     <td><img src="docs/screenshots/mobile-patients.png" alt="Patients" width="200"></td>
+  </tr>
+</table>
+
+Custom fields on mobile:
+
+<table>
+  <tr>
+    <td><img src="docs/screenshots/mobile-custom-fields.png" alt="Custom fields" width="200"></td>
+    <td><img src="docs/screenshots/mobile-custom-form.png" alt="Form with custom fields" width="200"></td>
   </tr>
 </table>
 

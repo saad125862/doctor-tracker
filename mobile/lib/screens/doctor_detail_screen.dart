@@ -7,6 +7,7 @@ import '../state/auth_state.dart';
 import '../state/paged_list.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
+import '../widgets/custom_fields.dart';
 import '../widgets/forms.dart';
 import '../widgets/patient_tile.dart';
 
@@ -25,6 +26,20 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
     final res = await api.get('/doctors/${doctor.id}/patients', query: {...f, 'page': page, 'limit': limit});
     return Paged.fromJson(res, Patient.fromJson);
   });
+
+  List<CustomField> doctorFields = [];
+  List<CustomField> patientFields = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadCustomFields(api, 'doctor').then((f) {
+      if (mounted) setState(() => doctorFields = f);
+    }).catchError((Object _) {});
+    loadCustomFields(api, 'patient').then((f) {
+      if (mounted) setState(() => patientFields = f);
+    }).catchError((Object _) {});
+  }
 
   @override
   void dispose() {
@@ -103,6 +118,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                 _Info(Icons.phone_rounded, d.phone),
                 _Info(Icons.mail_rounded, d.email),
                 if (d.createdAt != null) _Info(Icons.event_rounded, 'Joined ${DateFormat('d MMM yyyy').format(d.createdAt!)}'),
+                for (final e in customEntries(doctorFields, d.custom)) _Info(Icons.label_outline_rounded, '${e.$1}: ${e.$2}'),
               ]),
             ),
           ),
@@ -117,7 +133,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
             emptyIcon: Icons.groups_outlined,
             emptyTitle: 'No patients',
             emptyText: 'This doctor has no patients yet.',
-            itemBuilder: (_, p) => PatientTile(patient: p, showDoctor: false, onDelete: () => _deletePatient(p)),
+            itemBuilder: (_, p) => PatientTile(patient: p, showDoctor: false, fields: patientFields, onDelete: () => _deletePatient(p)),
           ),
         ),
       ]),

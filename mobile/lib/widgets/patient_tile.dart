@@ -3,10 +3,12 @@ import 'package:intl/intl.dart';
 import '../models.dart';
 import '../theme.dart';
 import 'common.dart';
+import 'custom_fields.dart';
 
 class PatientTile extends StatelessWidget {
-  const PatientTile({super.key, required this.patient, this.showDoctor = true, this.onEdit, this.onDelete});
+  const PatientTile({super.key, required this.patient, this.showDoctor = true, this.fields = const [], this.onEdit, this.onDelete});
   final Patient patient;
+  final List<CustomField> fields;
   final bool showDoctor;
   final VoidCallback? onEdit, onDelete;
 
@@ -36,6 +38,7 @@ class PatientTile extends StatelessWidget {
                 Pill.gender(p.gender),
                 Pill(p.condition, color: const Color(0xFFC3CED8), bg: const Color(0x298B98A5)),
               ]),
+              CustomValuesWrap(fields: fields, values: p.custom),
             ]),
           ),
           if (onEdit != null || onDelete != null)

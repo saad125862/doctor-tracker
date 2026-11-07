@@ -8,6 +8,14 @@ export class HttpError extends Error {
   }
 }
 
+/** 400 with per-field messages, same response shape as zod validation errors. */
+export class ValidationError extends HttpError {
+  constructor(errors) {
+    super(400, 'Validation failed');
+    this.errors = errors; // [{ field, message }]
+  }
+}
+
 export const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 /** Prefix match on pre-lowercased, indexed fields (an anchored regex can use the index; /i unanchored cannot). */

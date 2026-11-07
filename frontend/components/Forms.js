@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import CustomFields from './CustomFields';
 
 function Field({ label, name, form, setForm, errors, type = 'text', full, ...rest }) {
   return (
@@ -44,7 +45,7 @@ function FormShell({ initial, onSubmit, submitLabel, onCancel, pending, error, c
 
 export function DoctorForm(props) {
   return (
-    <FormShell initial={{ name: '', specialization: '', hospital: '', phone: '', email: '' }} submitLabel="Create doctor" {...props}>
+    <FormShell initial={{ name: '', specialization: '', hospital: '', phone: '', email: '', custom: {} }} submitLabel="Create doctor" {...props}>
       {(p) => (
         <>
           <Field label="Full name" name="name" full required placeholder="Dr. Jane Smith" {...p} />
@@ -52,6 +53,7 @@ export function DoctorForm(props) {
           <Field label="Hospital" name="hospital" required placeholder="City General" {...p} />
           <Field label="Phone" name="phone" required placeholder="+92 300 1234567" {...p} />
           <Field label="Email" name="email" type="email" required placeholder="jane@hospital.com" {...p} />
+          <CustomFields entity="doctor" {...p} />
         </>
       )}
     </FormShell>
@@ -65,6 +67,7 @@ export function PatientForm({ patient, doctors, ...props }) {
     gender: patient?.gender || 'male',
     condition: patient?.condition || '',
     phone: patient?.phone || '',
+    custom: { ...(patient?.custom || {}) },
     ...(doctors ? { doctor: patient?.doctor?._id || patient?.doctor || '' } : {}),
   };
   return (
@@ -98,6 +101,7 @@ export function PatientForm({ patient, doctors, ...props }) {
               </select>
             </label>
           )}
+          <CustomFields entity="patient" {...p} />
         </>
       )}
     </FormShell>

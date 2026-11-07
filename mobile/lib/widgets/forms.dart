@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../api/api_client.dart';
 import '../models.dart';
 import '../theme.dart';
+import 'custom_fields.dart';
 
 Widget _field(
   String label,
@@ -33,6 +34,16 @@ class _DoctorFormState extends State<DoctorForm> {
   final _key = GlobalKey<FormState>();
   final name = TextEditingController(), spec = TextEditingController(), hospital = TextEditingController();
   final phone = TextEditingController(), email = TextEditingController();
+  List<CustomField> fields = [];
+  final Map<String, dynamic> custom = {};
+
+  @override
+  void initState() {
+    super.initState();
+    loadCustomFields(widget.api, 'doctor').then((f) {
+      if (mounted) setState(() => fields = f);
+    }).catchError((Object _) {});
+  }
   Map<String, String> errors = {};
   String? general;
   bool saving = false;
@@ -51,6 +62,7 @@ class _DoctorFormState extends State<DoctorForm> {
         'hospital': hospital.text.trim(),
         'phone': phone.text.trim(),
         'email': email.text.trim(),
+        'custom': custom,
       });
       if (mounted) Navigator.pop(context, true);
     } on ApiException catch (e) {
@@ -81,6 +93,7 @@ class _DoctorFormState extends State<DoctorForm> {
             _field('Phone', phone, errors, 'phone', type: TextInputType.phone),
             const SizedBox(height: 12),
             _field('Email', email, errors, 'email', type: TextInputType.emailAddress),
+            CustomFieldInputs(fields: fields, values: custom, errors: errors, onChanged: (k, v) => setState(() => custom[k] = v)),
             if (general != null) Padding(padding: const EdgeInsets.only(top: 12), child: Text(general!, style: const TextStyle(color: AppColors.danger))),
             const SizedBox(height: 18),
             FilledButton(onPressed: saving ? null : _submit, child: Text(saving ? 'Saving...' : 'Create doctor')),
@@ -112,6 +125,16 @@ class _PatientFormState extends State<PatientForm> {
   late final phone = TextEditingController(text: widget.patient?.phone);
   late String gender = widget.patient?.gender.isNotEmpty == true ? widget.patient!.gender : 'male';
   late String? doctor = widget.patient?.doctorId;
+  List<CustomField> fields = [];
+  late final Map<String, dynamic> custom = {...?widget.patient?.custom};
+
+  @override
+  void initState() {
+    super.initState();
+    loadCustomFields(widget.api, 'patient').then((f) {
+      if (mounted) setState(() => fields = f);
+    }).catchError((Object _) {});
+  }
   Map<String, String> errors = {};
   String? general;
   bool saving = false;
@@ -132,6 +155,7 @@ class _PatientFormState extends State<PatientForm> {
       'condition': condition.text.trim(),
       'phone': phone.text.trim(),
       if (editing && doctor != null) 'doctor': doctor,
+      'custom': custom,
     };
     try {
       if (editing) {
@@ -200,6 +224,7 @@ class _PatientFormState extends State<PatientForm> {
               ),
             ],
             if (general != null) Padding(padding: const EdgeInsets.only(top: 12), child: Text(general!, style: const TextStyle(color: AppColors.danger))),
+            CustomFieldInputs(fields: fields, values: custom, errors: errors, onChanged: (k, v) => setState(() => custom[k] = v)),
             const SizedBox(height: 18),
             FilledButton(onPressed: saving ? null : _submit, child: Text(saving ? 'Saving...' : (editing ? 'Save changes' : 'Add patient'))),
           ]),

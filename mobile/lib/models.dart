@@ -1,6 +1,51 @@
 String _s(dynamic v) => v?.toString() ?? '';
 DateTime? _d(dynamic v) => v == null ? null : DateTime.tryParse(v.toString())?.toLocal();
 int _i(dynamic v) => (v as num?)?.toInt() ?? 0;
+Map<String, dynamic> _custom(dynamic v) => v is Map ? Map<String, dynamic>.from(v) : <String, dynamic>{};
+
+const fieldTypes = <(String, String)>[
+  ('text', 'Text'),
+  ('longtext', 'Long text'),
+  ('number', 'Number'),
+  ('date', 'Date'),
+  ('dropdown', 'Dropdown'),
+  ('boolean', 'Yes / No'),
+];
+
+String fieldTypeLabel(String t) => fieldTypes.firstWhere((e) => e.$1 == t, orElse: () => (t, t)).$2;
+
+/// An admin-defined extra field for the doctor or patient forms.
+class CustomField {
+  CustomField.fromJson(Map<String, dynamic> j)
+      : id = _s(j['_id']),
+        entity = _s(j['entity']),
+        key = _s(j['key']),
+        label = _s(j['label']),
+        type = _s(j['type']),
+        options = ((j['options'] as List?) ?? []).map((e) => e.toString()).toList(),
+        required = j['required'] == true;
+
+  final String id, entity, key, label, type;
+  final List<String> options;
+  final bool required;
+
+  /// Human-readable text for a stored value ('' when empty).
+  String format(dynamic v) {
+    if (v == null || v.toString().isEmpty) return '';
+    if (type == 'boolean') return v == true ? 'Yes' : 'No';
+    if (type == 'date') {
+      final d = DateTime.tryParse(v.toString());
+      if (d != null) return '${d.day.toString().padLeft(2, '0')} ${const ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.month - 1]} ${d.year}';
+    }
+    return v.toString();
+  }
+}
+
+/// (label, text) pairs for the fields that have a value.
+List<(String, String)> customEntries(List<CustomField> fields, Map<String, dynamic> values) => [
+      for (final f in fields)
+        if (f.format(values[f.key]).isNotEmpty) (f.label, f.format(values[f.key])),
+    ];
 
 class Doctor {
   Doctor.fromJson(Map<String, dynamic> j)
@@ -11,10 +56,14 @@ class Doctor {
         phone = _s(j['phone']),
         email = _s(j['email']),
         patientCount = _i(j['patientCount']),
+        custom = _custom(j['custom']),
         createdAt = _d(j['createdAt']);
 
   final String id, name, specialization, hospital, phone, email;
   final int patientCount;
+
+  /// Values of admin-defined custom fields, keyed by CustomField.key.
+  final Map<String, dynamic> custom;
   final DateTime? createdAt;
 }
 
@@ -28,10 +77,12 @@ class Patient {
         phone = _s(j['phone']),
         doctorId = j['doctor'] is Map ? _s((j['doctor'] as Map)['_id']) : _s(j['doctor']),
         doctorName = j['doctor'] is Map ? _s((j['doctor'] as Map)['name']) : '',
+        custom = _custom(j['custom']),
         createdAt = _d(j['createdAt']);
 
   final String id, name, gender, condition, phone, doctorId, doctorName;
   final int age;
+  final Map<String, dynamic> custom;
   final DateTime? createdAt;
 }
 

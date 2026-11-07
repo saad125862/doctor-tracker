@@ -10,13 +10,16 @@ import { AnimatePresence } from 'framer-motion';
 import { MRow } from '@/components/motion';
 import { ConfirmDialog, Modal } from '@/components/Modal';
 import { PatientForm } from '@/components/Forms';
+import { CustomLine } from '@/components/CustomFields';
+import { useCustomFields } from '@/hooks/useCustomFields';
 
-const Row = memo(function Row({ p, i, onEdit, onDelete }) {
+const Row = memo(function Row({ p, i, fields, onEdit, onDelete }) {
   return (
     <MRow i={i}>
       <td>
         <div style={{ fontWeight: 600 }}>{p.name}</div>
         <div className="muted hide-sm" style={{ fontSize: 13 }}>{p.phone || '—'}</div>
+        <CustomLine fields={fields} values={p.custom} />
       </td>
       <td>{p.age}</td>
       <td><GenderBadge gender={p.gender} /></td>
@@ -40,6 +43,7 @@ export default function PatientsPage() {
   const { state, params, set, setPage, reset, active } = useListFilters();
   const [editing, setEditing] = useState(null);
   const [toDelete, setToDelete] = useState(null);
+  const { data: patientFields = [] } = useCustomFields('patient');
 
   const { data, error, isLoading, isPlaceholderData } = useQuery({
     queryKey: ['patients', params],
@@ -142,7 +146,7 @@ export default function PatientsPage() {
               </thead>
               <tbody>
                 {data.data.map((p, i) => (
-                  <Row key={p._id} p={p} i={i} onEdit={onEdit} onDelete={onDelete} />
+                  <Row key={p._id} p={p} i={i} fields={patientFields} onEdit={onEdit} onDelete={onDelete} />
                 ))}
               </tbody>
             </table>

@@ -7,6 +7,7 @@ import * as auth from '../controllers/auth.js';
 import * as doctors from '../controllers/doctors.js';
 import * as patients from '../controllers/patients.js';
 import * as dashboard from '../controllers/dashboard.js';
+import * as customFields from '../controllers/customFields.js';
 
 const router = Router();
 
@@ -30,6 +31,12 @@ router.get('/auth/me', requireAuth, h(auth.me));
 router.use(requireAuth);
 
 router.get('/dashboard/stats', validate({ query: s.dashboardQuery }), h(dashboard.stats));
+
+router.get('/custom-fields', validate({ query: s.customFieldQuery }), h(customFields.listFields));
+router.post('/custom-fields', validate({ body: s.customFieldBody }), h(customFields.createField));
+router.put('/custom-fields/reorder', validate({ body: s.customFieldReorder }), h(customFields.reorderFields));
+router.patch('/custom-fields/:id', validate({ params: s.idParam, body: s.customFieldUpdate }), h(customFields.updateField));
+router.delete('/custom-fields/:id', validate({ params: s.idParam }), h(customFields.archiveField));
 
 router.get('/doctors', validate({ query: s.doctorQuery }), h(doctors.listDoctors));
 router.get('/doctors/filters', h(doctors.doctorFilters));

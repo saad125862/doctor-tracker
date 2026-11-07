@@ -1,6 +1,7 @@
 import { Doctor } from '../models/Doctor.js';
 import { Patient } from '../models/Patient.js';
 import { HttpError, SORTS, dateRange, pageMeta, prefixSearch } from '../utils/helpers.js';
+import { validateCustom } from '../utils/customFields.js';
 
 export async function listPatients(req, res) {
   const { page, limit, q, from, to, sort, condition, gender, doctor } = req.validQuery;
@@ -35,7 +36,16 @@ export async function updatePatient(req, res) {
   const patient = await Patient.findById(req.params.id);
   if (!patient) throw new HttpError(404, 'Patient not found');
   if (req.body.doctor && !(await Doctor.exists({ _id: req.body.doctor }))) throw new HttpError(404, 'Doctor not found');
-  patient.set(req.body);
+  const { custom, ...rest } = req.body;
+  patient.set(rest);
+  if (custom !== undefined) {
+    // only the keys sent are checked; an empty value clears that key
+    const { set, clear } = await validateCustom('patient', custom, { partial: true });
+    const next = { ...(patient.custom || {}), ...set };
+    clear.forEach((k) => delete next[k]);
+    patient.custom = next;
+    patient.markModified('custom');
+  }
   await patient.save(); // runs the hook that refreshes the lowercase search fields
   res.json({ data: patient });
 }
