@@ -11,6 +11,8 @@ export const env = {
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
   corsOrigins: (process.env.CORS_ORIGIN || 'http://localhost:3000').split(',').map((s) => s.trim()),
+  // When true, POST /api/auth/demo signs in as the seeded admin without a password (demos only)
+  demoMode: process.env.DEMO_MODE === 'true',
   adminEmail: process.env.ADMIN_EMAIL,
   adminPassword: process.env.ADMIN_PASSWORD,
 };

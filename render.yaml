@@ -17,6 +17,8 @@ services:
         generateValue: true
       - key: CORS_ORIGIN
         sync: false # your Vercel URL, e.g. https://doctor-tracker.vercel.app
+      - key: DEMO_MODE
+        value: "true" # enables one-click demo sign-in; set to "false" for real use
       - key: ADMIN_EMAIL
         sync: false
       - key: ADMIN_PASSWORD

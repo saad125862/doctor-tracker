@@ -13,13 +13,25 @@ const cookieOptions = {
   path: '/',
 };
 
+function startSession(res, user) {
+  const token = jwt.sign({ sub: user.id, role: user.role }, env.jwtSecret, { expiresIn: env.jwtExpiresIn });
+  res.cookie(COOKIE_NAME, token, cookieOptions);
+  res.json({ user: { id: user.id, name: user.name, email: user.email, role: user.role }, token });
+}
+
 export async function login(req, res) {
   const { email, password } = req.body;
   const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
   if (!user || !(await user.verifyPassword(password))) throw new HttpError(401, 'Invalid email or password');
-  const token = jwt.sign({ sub: user.id, role: user.role }, env.jwtSecret, { expiresIn: env.jwtExpiresIn });
-  res.cookie(COOKIE_NAME, token, cookieOptions);
-  res.json({ user: { id: user.id, name: user.name, email: user.email, role: user.role }, token });
+  startSession(res, user);
+}
+
+/** One-click demo sign-in. Disabled (404) unless DEMO_MODE=true on the server. */
+export async function demoLogin(_req, res) {
+  if (!env.demoMode || !env.adminEmail) throw new HttpError(404, 'Route not found');
+  const user = await User.findOne({ email: env.adminEmail.toLowerCase() });
+  if (!user) throw new HttpError(404, 'Demo user not found');
+  startSession(res, user);
 }
 
 export function logout(_req, res) {

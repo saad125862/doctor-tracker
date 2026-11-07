@@ -41,7 +41,9 @@ cd frontend && npm install && npm run dev                      # http://localhos
 | | `JWT_SECRET` | Signs session tokens. Use a long random value in production |
 | | `CORS_ORIGIN` | Comma-separated allowed frontend origins |
 | | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Admin account auto-created on first boot |
+| | `DEMO_MODE` | `true` enables `POST /api/auth/demo` (one-click demo sign-in). Set `false` for real use |
 | `frontend/.env.local` | `BACKEND_URL` | Where the Next.js `/api` rewrite forwards requests |
+| | `NEXT_PUBLIC_DEMO_MODE` | `true` shows the "Quick sign in as demo admin" button on the login page |
 
 See `backend/.env.example` and `frontend/.env.example`.
 
@@ -69,6 +71,7 @@ Browser ──► Next.js (Vercel / :3000)
 | Method | Route | Description |
 | --- | --- | --- |
 | POST | `/api/auth/login` · `/logout` | Sign in / out |
+| POST | `/api/auth/demo` | One-click demo sign-in (only when `DEMO_MODE=true`, otherwise 404) |
 | GET | `/api/auth/me` | Current user |
 | GET | `/api/dashboard/stats?days=30` | Totals, timeline, patients per doctor, conditions |
 | GET / POST | `/api/doctors` | List (search, filters, pagination) / create |

@@ -231,3 +231,9 @@ tr:hover .avatar { transform: scale(1.08); }
   .blob, .btn::after { animation: none; transition: none; }
   * { scroll-behavior: auto !important; }
 }
+
+/* quick sign-in */
+.or-divider { display: flex; align-items: center; gap: 14px; color: var(--muted); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
+.or-divider::before, .or-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.btn-quick { background: #e6f4f1; color: #0b5a54; border: 1.5px solid var(--primary); }
+.btn-quick:hover:not(:disabled) { background: #d3ece7; box-shadow: none; }

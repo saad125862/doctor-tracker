@@ -22,6 +22,7 @@ router.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
 // auth
 router.post('/auth/login', loginLimiter, validate({ body: s.loginBody }), h(auth.login));
+router.post('/auth/demo', loginLimiter, h(auth.demoLogin));
 router.post('/auth/logout', auth.logout);
 router.get('/auth/me', requireAuth, h(auth.me));
 
