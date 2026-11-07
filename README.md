@@ -109,12 +109,18 @@ The free Render tier sleeps when idle, so the first request after a pause can ta
 
 ## Visual evidence
 
+Theme: **Midnight Lime**, a dark charcoal UI with a lime accent (Space Grotesk headings, Inter body).
+
+**Login**
+
+![Login](docs/screenshots/login-desktop.jpg)
+
 **Desktop**
 
 | Dashboard | Doctors | Patients |
 | --- | --- | --- |
 | ![Dashboard desktop](docs/screenshots/dashboard-desktop.jpg) | ![Doctors desktop](docs/screenshots/doctors-desktop.jpg) | ![Patients desktop](docs/screenshots/patients-desktop.jpg) |
 
-**Mobile (375px)**
+**Mobile**
 
 <img src="docs/screenshots/dashboard-mobile.jpg" alt="Dashboard mobile" width="300" />

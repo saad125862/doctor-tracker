@@ -9,7 +9,8 @@ import { api } from '@/lib/api';
 import { formatDate, initials } from '@/lib/format';
 import { ErrorState, Skeleton } from '@/components/ui';
 
-const COLORS = ['#0d9488', '#6366f1', '#f59e0b', '#ec4899', '#0ea5e9', '#84cc16'];
+const COLORS = ['#a3e635', '#818cf8', '#fbbf24', '#f472b6', '#38bdf8', '#2dd4bf'];
+const TIP = { background: '#131a24', border: '1px solid #243042', borderRadius: 10, color: '#e6edf3' };
 const shortDate = (d) => new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
 
 const StatCard = memo(function StatCard({ icon, label, value, delta, decimals = 0 }) {
@@ -32,20 +33,20 @@ const GrowthChart = memo(function GrowthChart({ data }) {
         <AreaChart data={data} margin={{ top: 5, right: 8, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="gp" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#0d9488" stopOpacity={0.35} />
-              <stop offset="95%" stopColor="#0d9488" stopOpacity={0} />
+              <stop offset="5%" stopColor="#a3e635" stopOpacity={0.35} />
+              <stop offset="95%" stopColor="#a3e635" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="gd" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+              <stop offset="5%" stopColor="#818cf8" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="#818cf8" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#243042" vertical={false} />
           <XAxis dataKey="date" tickFormatter={shortDate} tick={{ fontSize: 12 }} minTickGap={24} />
           <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
-          <Tooltip labelFormatter={shortDate} />
-          <Area type="monotone" dataKey="patients" name="New patients" stroke="#0d9488" strokeWidth={2} fill="url(#gp)" />
-          <Area type="monotone" dataKey="doctors" name="New doctors" stroke="#6366f1" strokeWidth={2} fill="url(#gd)" />
+          <Tooltip contentStyle={TIP} itemStyle={{ color: '#e6edf3' }} labelStyle={{ color: '#8b98a5' }} labelFormatter={shortDate} />
+          <Area type="monotone" dataKey="patients" name="New patients" stroke="#a3e635" strokeWidth={2} fill="url(#gp)" />
+          <Area type="monotone" dataKey="doctors" name="New doctors" stroke="#818cf8" strokeWidth={2} fill="url(#gd)" />
         </AreaChart>
       </ResponsiveContainer>
     </div>
@@ -57,11 +58,11 @@ const PerDoctorChart = memo(function PerDoctorChart({ data }) {
     <div className="chart-box" style={{ height: 320 }}>
       <ResponsiveContainer>
         <BarChart data={data} layout="vertical" margin={{ top: 0, right: 16, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#243042" horizontal={false} />
           <XAxis type="number" allowDecimals={false} tick={{ fontSize: 12 }} />
           <YAxis type="category" dataKey="name" width={130} tick={{ fontSize: 12 }} />
-          <Tooltip cursor={{ fill: '#f1f5f9' }} />
-          <Bar dataKey="patients" name="Patients" fill="#0d9488" radius={[0, 6, 6, 0]} />
+          <Tooltip contentStyle={TIP} itemStyle={{ color: '#e6edf3' }} labelStyle={{ color: '#8b98a5' }} cursor={{ fill: '#1a2230' }} />
+          <Bar dataKey="patients" name="Patients" fill="#a3e635" radius={[0, 6, 6, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -79,7 +80,7 @@ const Donut = memo(function Donut({ data }) {
                 <Cell key={i} fill={COLORS[i % COLORS.length]} />
               ))}
             </Pie>
-            <Tooltip />
+            <Tooltip contentStyle={TIP} itemStyle={{ color: '#e6edf3' }} labelStyle={{ color: '#8b98a5' }} />
           </PieChart>
         </ResponsiveContainer>
       </div>
