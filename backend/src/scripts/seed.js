@@ -16,6 +16,13 @@ const hospitals = ['City General Hospital', 'Green Valley Medical Center', 'St. 
 const conditions = ['Hypertension', 'Diabetes', 'Asthma', 'Migraine', 'Arthritis', 'Anxiety', 'Fracture', 'Allergy', 'Flu', 'Back Pain'];
 const name = () => `${pick(first)} ${pick(last)}`;
 
+// Safety: seeding WIPES doctors and patients, so a non-local database needs an explicit --force.
+const isLocal = /^mongodb:\/\/(localhost|127\.0\.0\.1|mongo)(:|\/)/.test(env.mongoUri);
+if (!isLocal && !process.argv.includes('--force')) {
+  console.error('Refusing to seed a remote database. This deletes all doctors and patients.\nRe-run with:  npm run seed -- --force');
+  process.exit(1);
+}
+
 await connectDB();
 await Promise.all([Doctor.deleteMany({}), Patient.deleteMany({})]);
 await Promise.all([Doctor.init(), Patient.init()]);
